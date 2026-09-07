@@ -60,6 +60,26 @@ avancent à leur rythme, il n'y a rien à ouvrir ni fermer, contrairement au BTS
 La table `eleves` ne contient **ni nom, ni prénom, ni adresse**. Numéro, avatar,
 code PIN. Ne jamais proposer d'y ajouter un champ nominatif.
 
+## L'appel et le suivi en direct
+
+**L'appel se fait au portail.** Séance **numéro 99** de la classe, « Appel -
+question du jour », ouverte en permanence — 99 et non 0, puisque la séance 0
+est déjà votre TP0 : une question par date, nommée
+`appel-AAAA-MM-JJ` (script `APPEL.sql` du dépôt `portail-bts`). Y répondre,
+c'est être présent.
+
+C'est **le seul repère de date de ce cours**. Les 5 séances de TP étant ouvertes
+en permanence, elles ne disent pas quel jour l'étudiant était là. Ne jamais
+déduire la présence de l'avancement des missions : un étudiant peut avancer
+depuis chez lui, un autre être présent sans rien cocher.
+
+Pendant l'heure : portail → espace enseignant → classe `BTS2-SLAM-2026` → le TP
+en cours. Les missions cochées remontent en `reponse = "ok"` ou `"ko"` et
+n'entrent **pas** dans le taux de réussite ; seules les questions de quiz y
+entrent. Le classement se lit donc en avancement, pas en note.
+
+Après l'heure : vues `v_appel` et `v_absences`.
+
 ## Points de vigilance
 
 - **`devcontainer.json` : jamais de `${localWorkspaceFolder}`.** Cette variable
