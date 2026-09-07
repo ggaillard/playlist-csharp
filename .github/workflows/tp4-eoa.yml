@@ -1,0 +1,67 @@
+name: "TP4 – Architecture événementielle (EOA)"
+
+# Les tests EOA vivent dans le même projet que ceux du TP3
+# (PlaylistAppAPI.Tests). Sans ce workflow ils tournaient bien, mais sous le
+# badge « TP3 – API » : l'étudiant qui terminait le TP4 n'avait rien de vert
+# qui dise TP4. Le filtre ci-dessous isole les cinq tests du bus d'événements.
+
+on:
+  push:
+    paths:
+      - "PlaylistAppAPI/**"
+      - "PlaylistAppAPI.Tests/EventBusTests.cs"
+      - ".github/workflows/tp4-eoa.yml"
+  pull_request:
+    paths:
+      - "PlaylistAppAPI/**"
+      - "PlaylistAppAPI.Tests/EventBusTests.cs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  eoa-tests:
+    name: "🎏 Tests EOA (bus d'événements)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "⚙️ Setup .NET 10"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: "📦 Restore"
+        run: dotnet restore PlaylistAppAPI.Tests/PlaylistAppAPI.Tests.csproj
+
+      - name: "🏗️ Build"
+        run: dotnet build PlaylistAppAPI.Tests/PlaylistAppAPI.Tests.csproj -c Release --no-restore
+
+      - name: "🧪 Les 5 tests du bus d'événements"
+        env:
+          DB_PATH: /tmp
+          ASPNETCORE_ENVIRONMENT: Testing
+        run: |
+          dotnet test PlaylistAppAPI.Tests/PlaylistAppAPI.Tests.csproj \
+            -c Release --no-build \
+            --filter "FullyQualifiedName~EventBusTests" \
+            --verbosity normal \
+            --logger "trx;LogFileName=tp4-results.trx"
+
+      - name: "📊 Rapport tests EOA"
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: "Tests TP4 – Architecture événementielle"
+          path: "**/tp4-results.trx"
+          reporter: "dotnet-trx"
+
+      - name: "📋 Résumé"
+        if: always()
+        run: |
+          echo "## Résultats TP4 🎏" >> $GITHUB_STEP_SUMMARY
+          echo "Publication d'événements, HistoriqueHandler, NoteModifieeEvent." >> $GITHUB_STEP_SUMMARY

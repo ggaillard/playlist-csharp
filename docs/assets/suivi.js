@@ -37,12 +37,27 @@
   var minuteur = null;
 
   // ── Mapping d'une clé d'état vers le TP concerné ────────────────────────
-  // Missions : "tp2-m1" -> TP 2      Quiz : "q-2-3" -> TP 2
+  // Missions : "tp2-m1" -> TP 2. Le numéro est dans la clé, rien à traduire.
+  //
+  // Quiz : "q-2-3" -> bloc 2, question 3. Attention, le premier nombre est
+  // l'INDICE DU BLOC de quiz, pas le numéro du TP : il y a sept blocs pour
+  // cinq TP, le TP1 et le TP2 en ayant deux chacun. Les confondre envoyait
+  // le quiz LINQ sur la séance du TP2, celui du TP2 sur les séances TP3 et
+  // TP4 — et perdait purement les blocs 5 et 6, puisqu'il n'existe pas de
+  // séance numéro 5 ni 6 : l'envoi sortait en silence.
+  //
+  // Cette table suit l'ordre des blocs dans QUIZ (docs/index.html). Ajouter
+  // un bloc de quiz oblige à ajouter son TP ici.
+  var TP_DU_BLOC = [0, 1, 1, 2, 2, 3, 4];
+
   function tpDeLaCle(cle) {
     var m = /^tp(\d)/.exec(cle);
     if (m) return parseInt(m[1], 10);
     m = /^q-(\d+)-/.exec(cle);
-    if (m) return parseInt(m[1], 10);
+    if (m) {
+      var bloc = parseInt(m[1], 10);
+      return bloc < TP_DU_BLOC.length ? TP_DU_BLOC[bloc] : null;
+    }
     return null;
   }
 
@@ -121,17 +136,25 @@
       if (r.error || !r.data) return;
       if (!r.data.length) { dernierEnvoi = aplatir(window.state); envoyer(); return; }
 
+      // « dernierEnvoi » doit refléter ce que le SERVEUR a, pas l'état fusionné.
+      // En le construisant sur la fusion, tout ce que ce poste avait en local
+      // et que le serveur n'avait pas était réputé déjà envoyé, donc jamais
+      // transmis. C'est ce qui aurait laissé les réponses perdues du TP3 et du
+      // TP4 sur les postes des étudiants ; ainsi elles repartent d'elles-mêmes.
+      var serveur = {};
       r.data.forEach(function (ligne) {
         var v = ligne.reponse;
         if (v === "true") v = true;
         else if (v === "false" || v === "" || v === null) return;
         else if (/^\d+$/.test(v)) v = parseInt(v, 10);
         window.state[ligne.question] = v;
+        serveur[ligne.question] = String(ligne.reponse);
       });
-      dernierEnvoi = aplatir(window.state);
+      dernierEnvoi = serveur;
       try { localStorage.setItem("playlistapp-progression", JSON.stringify(window.state)); } catch (e) {}
       window.render();
       window.renderQuiz();
+      envoyer();
     });
   }
 

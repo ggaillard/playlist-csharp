@@ -8,7 +8,7 @@ namespace PlaylistAppEF.Tests;
 
 /// <summary>
 /// Tests unitaires dédiés aux playlists et à la relation N-N PlaylistChanson.
-/// (Référencé par .github/classroom/autograding.json)
+/// (Exécutés par .github/workflows/tp2-tests.yml — badge « TP2 – Tests »)
 /// </summary>
 public class PlaylistTests
 {

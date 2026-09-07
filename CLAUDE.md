@@ -100,3 +100,40 @@ git add . && git commit && git push
 ```
 
 Le dépôt est **public**. Demander confirmation avant tout `git push`.
+
+---
+
+## Le quiz : sept blocs pour cinq TP
+
+`QUIZ` dans `docs/index.html` compte **sept** blocs, parce que le TP1 et le
+TP2 en ont deux chacun. La clé d'une réponse est `q-<indice du bloc>-<question>` :
+
+| bloc | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| TP | 0 | 1 | 1 | 2 | 2 | 3 | 4 |
+
+`tpDeLaCle()` dans `docs/assets/suivi.js` lisait cet indice **comme** un numéro
+de TP. Conséquence : le quiz LINQ était rangé sur la séance du TP2, celui du
+TP2 sur les séances TP3 et TP4, et les blocs 5 et 6 étaient purement perdus —
+il n'existe pas de séance numéro 5 ni 6, et l'envoi sortait en silence.
+
+La table `TP_DU_BLOC` fait la traduction. **Ajouter un bloc de quiz oblige à
+ajouter son TP dans cette table.**
+
+## Ce que le suivi enregistre
+
+| Clé | Valeur | Ce que c'est |
+|---|---|---|
+| `tp2-m1`, `tp1-c0`, `tp2-s1`, `tp0-1` | `true` / `false` | une case cochée — **un jalon** |
+| `q-3-2` | `ok` / `ko` | une question de quiz |
+| `q-3-2-pick` | `0` à `3` | l'option choisie |
+
+Les 29 items du parcours se répartissent en **3 · 5 · 8 · 7 · 6**. Tous ne sont
+pas des `-m` : le TP0 n'en a aucun, et chaque TP a sa fiche concept `-c0` et
+ses mises en route `-s`. Le portail compte donc les clés commençant par `tp`
+dont la réponse vaut `true` — ni « toutes les lignes » (les quiz seraient
+comptés), ni « les `-m` seuls » (les deux tiers manqueraient).
+
+`dernierEnvoi` doit être construit sur ce que le **serveur** renvoie, jamais
+sur l'état fusionné : autrement, tout ce que le poste a en local et que le
+serveur n'a pas est réputé déjà envoyé, donc jamais transmis.
